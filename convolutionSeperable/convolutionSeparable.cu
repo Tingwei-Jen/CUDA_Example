@@ -224,7 +224,7 @@ extern "C" void convolutionColumnsGPU(float *d_Dst, float *d_Src, int imageW, in
     int stride = BLOCKDIM_Y * RESULT_STEPS;
     dim3 dimGrid((imageW + BLOCKDIM_X - 1) / (BLOCKDIM_X), 
                  (imageH + stride - 1) / (stride));
-    printf("dimGrid: %d %d\n", dimGrid.x, dimGrid.y);
+
     int kernelRadius = kernelSize / 2;
     int colsHaloSteps = kernelRadius / BLOCKDIM_Y + 1; 
 
