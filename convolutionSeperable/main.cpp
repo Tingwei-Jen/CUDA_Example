@@ -45,9 +45,9 @@ int main(int argc, char **argv) {
     float *h_kernel;
 
     // image size and kernel size
-    const int imageW = 1920;
-    const int imageH = 1080;
-    const int kernelSize = 7;
+    const int imageW = 3072;
+    const int imageH = 3072;
+    const int kernelSize = 35;
     int bufferSize = imageW * imageH * sizeof(float);
 
     // initialize timer
