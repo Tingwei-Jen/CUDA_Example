@@ -8,7 +8,7 @@
 // Utilities and system includes
 #include <helper_functions.h>
 #include <helper_cuda.h>
-
+#include <cuda_profiler_api.h>
 #include "sgemm.h"
 
 void random_init(float *data, int size)
@@ -36,9 +36,9 @@ int main(int argc, char* argv[]) {
     int test_iter = 100;
 	float *h_A, *h_B, *h_C;
 	float *d_A, *d_B, *d_C;
-	int N = 2048;
-    int M = 2048;
-    int K = 2048;
+	int N = 4096;
+    int M = 4096;
+    int K = 4096;
 	float alpha = 1.f;
 	float beta = 0.f;
 
@@ -63,7 +63,9 @@ int main(int argc, char* argv[]) {
     cudaMemcpy(d_C, h_C, M * N * sizeof(float), cudaMemcpyHostToDevice);
     
     // warm-up
-    sgemm_gpu(d_A, d_B, d_C, M, N, K, alpha, beta);
+    cudaProfilerStart();
+    sgemm_gpu_tile2d(d_A, d_B, d_C, M, N, K, alpha, beta);
+    cudaProfilerStop();
 
     // reset timer
     checkCudaErrors(cudaDeviceSynchronize());
@@ -75,7 +77,7 @@ int main(int argc, char* argv[]) {
 
     for (int i = 0; i < test_iter; i++) {
         // Launch kernel
-        sgemm_gpu(d_A, d_B, d_C, M, N, K, alpha, beta);
+        sgemm_gpu_tile2d(d_A, d_B, d_C, M, N, K, alpha, beta);
     }
 
     // event record
@@ -95,6 +97,9 @@ int main(int argc, char* argv[]) {
     // print elapsed time by sdk timer
     float elapsed_timer_gpu = sdkGetTimerValue(&hTimer) / (float)test_iter;
     printf("Processing Time by timer: %.6f ms\n", elapsed_timer_gpu);
+
+    float gflops = 2.f * (float)M * (float)N * (float)K / (elapsed_timer_gpu / 1000.f) / 1e9;
+    printf("GFLOPS: %.6f\n", gflops);
 
     // copy data from device to host
     cudaMemcpy(h_C, d_C, M * N * sizeof(float), cudaMemcpyDeviceToHost);
@@ -135,6 +140,9 @@ int main(int argc, char* argv[]) {
     // print elapsed time by sdk timer
     float elapsed_timer_cublas = sdkGetTimerValue(&hTimer);
     printf("Processing Time by CUBLAS timer: %.6f ms\n", elapsed_timer_cublas);
+
+    float gflops_cublas = 2.f * (float)M * (float)N * (float)K / (elapsed_timer_cublas / 1000.f) / 1e9;
+    printf("GFLOPS CUBLAS: %.6f\n", gflops_cublas);
 
     // copy data from device to host
     cudaMemcpy(h_C_cublas, d_C_cublas, M * N * sizeof(float), cudaMemcpyDeviceToHost);

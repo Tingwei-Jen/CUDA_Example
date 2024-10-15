@@ -20,6 +20,10 @@
  * @param beta Scalar multiplier for the matrix C.
  */
 void sgemm_gpu(const float *A, const float *B, float *C, int M, int N, int K, float alpha, float beta);
-
+void sgemm_gpu_shared(const float *A, const float *B, float *C, int M, int N, int K, float alpha, float beta);
+void sgemm_gpu_shared2(const float *A, const float *B, float *C, int M, int N, int K, float alpha, float beta);
+void sgemm_gpu_tile2d(const float *A, const float *B, float *C, int M, int N, int K, float alpha, float beta);
+void sgemm_gpu_tile2d_solveBC(const float *A, const float *B, float *C, int M, int N, int K, float alpha, float beta);
+void sgemm_gpu_tile2d_float4(float *A, float *B, float *C, int M, int N, int K, float alpha, float beta);
 
 #endif // SGEMM_H
