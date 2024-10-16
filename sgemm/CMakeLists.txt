@@ -31,7 +31,14 @@ find_package(Eigen3 REQUIRED)
 # 找到 cuBLAS 庫
 find_library(CUBLAS_LIB cublas HINTS ${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 
-add_executable(${PROJECT_NAME} main.cpp sgemm.cu)
+add_executable(${PROJECT_NAME} main.cpp 
+    sgemm_naive.cu 
+    sgemm_shared.cu 
+    sgemm_shared_bk.cu 
+    sgemm_tile2d.cu
+    sgemm_tile2d_padding.cu
+    sgemm_tile2d_transpose.cu
+    sgemm_tile2d_float4.cu)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     ${CUDA_INCLUDE_DIRS} 

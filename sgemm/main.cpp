@@ -22,7 +22,10 @@ void random_init(float *data, int size)
 int main(int argc, char* argv[]) {
 
     // start logs
-    printf("[%s] - Starting...\n", argv[0]);
+    if (argc < 2) {
+        std::cerr << "Usage: " << argv[0] << " <matrix_size>" << std::endl;
+        return -1;
+    }
 
     // initialize timer
     StopWatchInterface *hTimer;
@@ -36,9 +39,10 @@ int main(int argc, char* argv[]) {
     int test_iter = 100;
 	float *h_A, *h_B, *h_C;
 	float *d_A, *d_B, *d_C;
-	int N = 4096;
-    int M = 4096;
-    int K = 4096;
+    int matrix_size = std::stoi(argv[1]);
+    int N = matrix_size;
+    int M = matrix_size;
+    int K = matrix_size;
 	float alpha = 1.f;
 	float beta = 0.f;
 
@@ -64,7 +68,7 @@ int main(int argc, char* argv[]) {
     
     // warm-up
     cudaProfilerStart();
-    sgemm_gpu_tile2d(d_A, d_B, d_C, M, N, K, alpha, beta);
+    sgemm_tile2d_float4(d_A, d_B, d_C, M, N, K, alpha, beta);
     cudaProfilerStop();
 
     // reset timer
@@ -77,7 +81,7 @@ int main(int argc, char* argv[]) {
 
     for (int i = 0; i < test_iter; i++) {
         // Launch kernel
-        sgemm_gpu_tile2d(d_A, d_B, d_C, M, N, K, alpha, beta);
+        sgemm_tile2d_float4(d_A, d_B, d_C, M, N, K, alpha, beta);
     }
 
     // event record
